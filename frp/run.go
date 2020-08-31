@@ -17,7 +17,7 @@ func CheckStatus() int {
 		println("frp 未启动")
 		return 0
 	}
-	fmt.Print(out)
+	utils.Log.Info(out)
 	re, _ := regexp.Compile(`\d+`)
 	//查找符合正则的第一个
 	all := re.FindAll([]byte(out), -1)
@@ -38,7 +38,7 @@ func Start() {
 	frpc := utils.GetDirectory(workspace + "/frpc")[0]
 	frpStatus := exec.Command(frpc+"/frpc.exe", "-c", frpc+"/frpc.ini")
 	frpStatus.Start()
-	println("frpc start success...")
+	utils.Log.Info("frpc start success...")
 }
 
 // 关闭frpc
@@ -48,15 +48,22 @@ func Stop() {
 	if out == "" {
 		println("frp 未启动")
 	}
-	fmt.Print(out)
+	utils.Log.Info(out)
 	println("frpc closed...")
 }
 
 // 下载frp
 func Download() {
-	println("frp download start...")
+	utils.Log.Info("frp download start...")
 	workDir, _ := filepath.Abs("")
-	utils.Download("https://github.com/fatedier/frp/releases/download/v0.33.0/frp_0.33.0_windows_amd64.zip", workDir+"/frp.zip")
-	utils.UnZip(workDir+"/frp.zip", workDir+"/frpcc", true)
-	println("frp download end...")
+	utils.Log.Debug("frp download path: " + workDir)
+	utils.DownloadProcess("https://github.com/fatedier/frp/releases/download/v0.33.0/frp_0.33.0_windows_amd64.zip", workDir+"/frp.zip", func(length, downLen int64) {
+		fmt.Println(length, downLen, float32(downLen)/float32(length))
+	})
+	utils.Log.Info("frp download end...")
+
+	utils.Log.Info("frp.zip start unzip...")
+	utils.Log.Debug("frp unzip path:" + workDir)
+	utils.UnZip(workDir+"/frp.zip", workDir+"/frpc", true)
+	utils.Log.Info("frp.zip end unzip...")
 }

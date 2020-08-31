@@ -13,8 +13,12 @@ import (
 func GetIniFilePath() string {
 	// 获取配置文件路径
 	workspace, _ := filepath.Abs("")
-	frpc := utils.GetDirectory(workspace + "/frpc")[0]
-	return frpc + "/frpc.ini"
+	frpcpath := utils.GetDirectory(workspace + "/frpc")
+	if len(frpcpath) == 1 {
+		frpc := frpcpath[0]
+		return frpc + "/frpc.ini"
+	}
+	return ""
 }
 
 func FullContent() string {
@@ -50,6 +54,16 @@ func GetSection(section string) string {
 	}
 
 	return lines.String()
+}
+
+func GetSections() []string {
+	filename := GetIniFilePath()
+	cfg, err := ini.Load(filename)
+	if err != nil {
+		fmt.Printf("Fail to read file: %v", err)
+		os.Exit(1)
+	}
+	return cfg.SectionStrings()
 }
 
 func SaveSection(section string, content string) {

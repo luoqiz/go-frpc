@@ -9,7 +9,7 @@ import (
 	"fyne.io/fyne/widget"
 	"go-frpc/frp"
 	"go-frpc/utils"
-	"path/filepath"
+	"gopkg.in/ini.v1"
 )
 
 const preferenceCurrentTab = "currentTab"
@@ -39,9 +39,6 @@ func MainWindow() {
 			fyne.NewMenuItem("frp", func() { fmt.Println("frp") }),
 			fyne.NewMenuItem("fyne", func() {
 				fmt.Println("fyne")
-				println("frp download start...")
-				workDir, _ := filepath.Abs("")
-				utils.UnZip(workDir+"/frp.zip", workDir+"/frpcc", true)
 			}),
 		)),
 	)
@@ -71,16 +68,16 @@ func AdvancedScreen(w fyne.Window) fyne.CanvasObject {
 		// 发送消息
 		utils.SendNotifiction("成功加载最新文件内容")
 	})
-	content.SetText(frp.FullContent())
+	//content.SetText(frp.FullContent())
 	return widget.NewVBox(saveButton, reloadButton, content)
 }
 
-func CommonService() fyne.CanvasObject {
+func CommonService(section string) fyne.CanvasObject {
 	content := widget.NewMultiLineEntry()
 	saveButton := widget.NewButton("save", func() {
-		frp.SaveSection("common", content.Text)
+		frp.SaveSection(section, content.Text)
 	})
-	content.SetText(frp.GetSection("common"))
+	content.SetText(frp.GetSection(section))
 	return widget.NewVBox(saveButton, content)
 }
 
@@ -102,15 +99,35 @@ func MstscService(section string) fyne.CanvasObject {
 	return widget.NewVBox(saveButton, content)
 }
 
+func loadService(section string) fyne.CanvasObject {
+	content := widget.NewMultiLineEntry()
+	saveButton := widget.NewButton("save", func() {
+		frp.SaveSection(section, content.Text)
+	})
+	content.SetText(frp.GetSection(section))
+	return widget.NewVBox(saveButton, content)
+}
+
 func SettingScreen() fyne.CanvasObject {
 
-	tabs := widget.NewTabContainer(
-		widget.NewTabItem("common", CommonService()),
-		widget.NewTabItem("http", WebService("web")),
-		widget.NewTabItem("mstsc", MstscService("mstsc")),
-	)
+	//tabs := widget.NewTabContainer(
+	//	widget.NewTabItem("common", CommonService("common")),
+	//	widget.NewTabItem("http", WebService("web")),
+	//	widget.NewTabItem("mstsc", MstscService("mstsc")),
+	//)
+	tabs := widget.NewTabContainer()
+	sections := frp.GetSections()
+	for _, section := range sections {
+		if section == ini.DefaultSection {
+			continue
+		}
+		tabs.Append(widget.NewTabItem(section, loadService(section)))
+	}
+
 	tabs.OnChanged = func(t *widget.TabItem) {
-		println(t.Content)
+		println(t.Text)
+		t.Content = loadService(t.Text)
+
 	}
 	return fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil),
 		tabs,
