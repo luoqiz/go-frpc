@@ -21,14 +21,15 @@ func GetIniFilePath() string {
 	return ""
 }
 
-func FullContent() string {
+func FullContent() (string, error) {
 	filename := GetIniFilePath()
 	//读取文本内容到文本框中
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Println("error : %s", err)
+		return "", err
 	}
-	return string(bytes)
+	return string(bytes), nil
 }
 
 func SetContent(content string) {
@@ -56,14 +57,14 @@ func GetSection(section string) string {
 	return lines.String()
 }
 
-func GetSections() []string {
+func GetSections() ([]string, error) {
 	filename := GetIniFilePath()
 	cfg, err := ini.Load(filename)
 	if err != nil {
 		fmt.Printf("Fail to read file: %v", err)
-		os.Exit(1)
+		return nil, err
 	}
-	return cfg.SectionStrings()
+	return cfg.SectionStrings(), nil
 }
 
 func SaveSection(section string, content string) {

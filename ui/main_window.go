@@ -8,7 +8,6 @@ import (
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
 	"go-frpc/frp"
-	"go-frpc/utils"
 	"gopkg.in/ini.v1"
 )
 
@@ -24,9 +23,8 @@ func MainWindow() {
 	w.Resize(fyne.NewSize(800, 600))
 	w.SetMainMenu(fyne.NewMainMenu(
 		fyne.NewMenu("frp",
-			fyne.NewMenuItem("download", func() {
-				frp.Download()
-			}),
+			//fyne.NewMenuItem("download", func() {
+			//}),
 			fyne.NewMenuItem("start", func() {
 				frp.Start()
 			}),
@@ -46,14 +44,34 @@ func MainWindow() {
 
 	tabs := widget.NewTabContainer(
 		widget.NewTabItemWithIcon("status", theme.HomeIcon(), statusScreen(a)),
-		widget.NewTabItemWithIcon("service", theme.ContentCopyIcon(), SettingScreen()),
-		widget.NewTabItemWithIcon("Advanced", theme.SettingsIcon(), AdvancedScreen(w)))
+		widget.NewTabItemWithIcon("service", theme.ContentCopyIcon(), ServiceScreen()),
+		widget.NewTabItemWithIcon("Advanced", theme.SettingsIcon(), AdvancedScreen(w)),
+		widget.NewTabItemWithIcon("frpc", theme.ConfirmIcon(), InfoScreen(w)))
 	tabs.SetTabLocation(widget.TabLocationLeading)
 	tabs.SelectTabIndex(a.Preferences().Int(preferenceCurrentTab))
+	tabs.OnChanged = func(tab *widget.TabItem) {
+		if tab.Text == "service" {
+			tab.Content = ServiceScreen()
+		}
+	}
+
 	w.SetContent(tabs)
 
 	w.ShowAndRun()
 	a.Preferences().SetInt(preferenceCurrentTab, tabs.CurrentTabIndex())
+}
+func InfoScreen(w fyne.Window) fyne.CanvasObject {
+	// 文本框
+	labelStr := widget.NewLabelWithStyle("", fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+	// 保存按钮
+	downloadButton := widget.NewButton("download", func() {
+		frp.Download(func(length, downLen int64) {
+			labelStr.SetText(fmt.Sprintln("process: ", int(downLen)*100/int(length), "%"))
+			fmt.Println(length, downLen, float32(downLen)/float32(length))
+		})
+		labelStr.SetText("download complete!")
+	})
+	return widget.NewVBox(downloadButton, labelStr)
 }
 func AdvancedScreen(w fyne.Window) fyne.CanvasObject {
 	// 文本框
@@ -64,9 +82,13 @@ func AdvancedScreen(w fyne.Window) fyne.CanvasObject {
 	})
 	// 重新加载按钮
 	reloadButton := widget.NewButton("reload", func() {
-		content.SetText(frp.FullContent())
-		// 发送消息
-		utils.SendNotifiction("成功加载最新文件内容")
+		fc, err := frp.FullContent()
+		if err != nil {
+			content.SetText("not fount the file : frpc.ini")
+		} else {
+			content.SetText(fc)
+		}
+
 	})
 	//content.SetText(frp.FullContent())
 	return widget.NewVBox(saveButton, reloadButton, content)
@@ -108,7 +130,7 @@ func loadService(section string) fyne.CanvasObject {
 	return widget.NewVBox(saveButton, content)
 }
 
-func SettingScreen() fyne.CanvasObject {
+func ServiceScreen() fyne.CanvasObject {
 
 	//tabs := widget.NewTabContainer(
 	//	widget.NewTabItem("common", CommonService("common")),
@@ -116,7 +138,10 @@ func SettingScreen() fyne.CanvasObject {
 	//	widget.NewTabItem("mstsc", MstscService("mstsc")),
 	//)
 	tabs := widget.NewTabContainer()
-	sections := frp.GetSections()
+	sections, err := frp.GetSections()
+	if err != nil {
+		return widget.NewLabel("please download frp...")
+	}
 	for _, section := range sections {
 		if section == ini.DefaultSection {
 			continue
@@ -127,7 +152,6 @@ func SettingScreen() fyne.CanvasObject {
 	tabs.OnChanged = func(t *widget.TabItem) {
 		println(t.Text)
 		t.Content = loadService(t.Text)
-
 	}
 	return fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil),
 		tabs,
@@ -140,7 +164,7 @@ func statusScreen(a fyne.App) fyne.CanvasObject {
 	pid := frp.CheckStatus()
 	showText := ""
 	if pid != 0 {
-		showText = fmt.Sprintln("running ... pid: %v", pid)
+		showText = fmt.Sprintln("running ... pid:", pid)
 	} else {
 		showText = fmt.Sprintln("frp not runing...")
 	}
@@ -151,9 +175,12 @@ func statusScreen(a fyne.App) fyne.CanvasObject {
 		widget.NewGroup("status",
 			fyne.NewContainerWithLayout(layout.NewGridLayout(2),
 				widget.NewButton("start", func() {
-					frp.Start()
-					pid := frp.CheckStatus()
-					statusShow.SetText(fmt.Sprintln("running pid: ", pid))
+					pid := frp.Start()
+					if pid != 0 {
+						statusShow.SetText(fmt.Sprintln("running pid: ", pid))
+					} else {
+						statusShow.SetText(fmt.Sprintln("please download frp... ", pid))
+					}
 				}),
 				widget.NewButton("stop", func() {
 					if frp.CheckStatus() != 0 {

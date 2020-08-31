@@ -1,7 +1,6 @@
 package frp
 
 import (
-	"fmt"
 	"go-frpc/utils"
 	"os/exec"
 	"path/filepath"
@@ -33,12 +32,18 @@ func CheckStatus() int {
 }
 
 //开启frpc
-func Start() {
+func Start() int {
 	workspace, _ := filepath.Abs("")
-	frpc := utils.GetDirectory(workspace + "/frpc")[0]
+	dir := utils.GetDirectory(workspace + "/frpc")
+	if len(dir) < 1 {
+		return 0
+	}
+	frpc := dir[0]
 	frpStatus := exec.Command(frpc+"/frpc.exe", "-c", frpc+"/frpc.ini")
 	frpStatus.Start()
+
 	utils.Log.Info("frpc start success...")
+	return CheckStatus()
 }
 
 // 关闭frpc
@@ -53,13 +58,11 @@ func Stop() {
 }
 
 // 下载frp
-func Download() {
+func Download(fb func(length, downLen int64)) {
 	utils.Log.Info("frp download start...")
 	workDir, _ := filepath.Abs("")
 	utils.Log.Debug("frp download path: " + workDir)
-	utils.DownloadProcess("https://github.com/fatedier/frp/releases/download/v0.33.0/frp_0.33.0_windows_amd64.zip", workDir+"/frp.zip", func(length, downLen int64) {
-		fmt.Println(length, downLen, float32(downLen)/float32(length))
-	})
+	utils.DownloadProcess("https://github.com/fatedier/frp/releases/download/v0.33.0/frp_0.33.0_windows_amd64.zip", workDir+"/frp.zip", fb)
 	utils.Log.Info("frp download end...")
 
 	utils.Log.Info("frp.zip start unzip...")
