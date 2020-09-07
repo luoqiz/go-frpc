@@ -9,3 +9,5 @@
 /frpc/
 frp.zip
 /.idea/
+/download/
+*.iml
