@@ -26,7 +26,7 @@ func FullContent() (string, error) {
 	//读取文本内容到文本框中
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Println("error : %s", err)
+		fmt.Printf("error : %s\n", err)
 		return "", err
 	}
 	return string(bytes), nil
