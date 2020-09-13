@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"go-frpc/utils"
+	"go-frpc/utils/cmd"
 	"log"
 	"net/http"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -16,24 +16,7 @@ import (
 
 //检查frp状态，未启动返回0，运行中返回其pid
 func CheckStatus() int {
-	out, _ := utils.ExecCmd("cmd.exe", "/c tasklist | findstr frp")
-
-	if out == "" {
-		println("frp 未启动")
-		return 0
-	}
-	utils.Log.Info(out)
-	re, _ := regexp.Compile(`\d+`)
-	//查找符合正则的第一个
-	all := re.FindAll([]byte(out), -1)
-	pid := 0
-	for index, item := range all {
-		if index == 0 {
-			pid, _ = strconv.Atoi(string(item))
-			break
-		}
-
-	}
+	pid, _ := cmd.CMDFactory{}.Generate().GetPID("frp")
 	return pid
 }
 
@@ -54,8 +37,7 @@ func Start() int {
 
 // 关闭frpc
 func Stop() {
-	//pid := CheckStatus()
-	out, _ := utils.ExecCmd("cmd.exe", "/c taskkill /f /im frpc.exe")
+	out, _ := cmd.CMDFactory{}.Generate().RunCommand("taskkill /f /im frpc.exe")
 	if out == "" {
 		println("frp 未启动")
 	}
