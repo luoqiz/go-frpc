@@ -101,7 +101,7 @@ func DownloadProcess(url string, savePath string, fb func(length, downLen int64)
 	return err
 }
 
-func unCompress(zipFile, dest string, isParentDir bool) (err error) {
+func UnCompress(zipFile, dest string, isParentDir bool) (err error) {
 	if runtime.GOOS == "windows" {
 		return UnZip(zipFile, dest, isParentDir)
 	}

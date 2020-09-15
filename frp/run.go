@@ -1,7 +1,6 @@
 package frp
 
 import (
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"go-frpc/utils"
 	"go-frpc/utils/cmd"
@@ -10,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 )
 
@@ -45,18 +43,20 @@ func Stop() {
 	println("frpc closed...")
 }
 
-// 下载frp
+// 下载并解压frp
 func Download(fb func(length, downLen int64)) {
-	utils.Log.Info("frp download start...")
 	workDir, _ := filepath.Abs("")
-	utils.Log.Debug("frp download path: " + workDir)
-	utils.DownloadProcess(LatestUrlOnOs(), workDir+"/frp.zip", fb)
+	utils.Log.Infof("frp download start into %s\n", workDir)
+
+	frpName, frpUrl := LatestUrlOnOs()
+	frpDownloadPath := workDir + "/" + frpName
+	utils.Log.Infof("frp download path : %s", frpDownloadPath)
+	utils.DownloadProcess(frpUrl, frpDownloadPath, fb)
 	utils.Log.Info("frp download end...")
 
-	utils.Log.Info("frp.zip start unzip...")
-	utils.Log.Debug("frp unzip path:" + workDir)
-	utils.UnZip(workDir+"/frp.zip", workDir+"/frpc", true)
-	utils.Log.Info("frp.zip end unzip...")
+	//utils.Log.Infof("frp unzip start into %s", workDir)
+	utils.UnCompress(frpDownloadPath, workDir+"/frpc", true)
+	//utils.Log.Info("frp.zip end unzip...")
 }
 
 func LatestTag(baseUrl string) string {
@@ -84,10 +84,9 @@ func LatestTag(baseUrl string) string {
 
 }
 
-func LatestUrlOnOs() string {
+func LatestUrlOnOs() (string, string) {
 	baseUrl := "https://github.com/fatedier/frp/tags"
 	latestUrl := LatestTag(baseUrl)
-	println("------------")
 	// Request the HTML page.
 	res, err := http.Get(latestUrl)
 	if err != nil {
@@ -107,22 +106,21 @@ func LatestUrlOnOs() string {
 	osname := runtime.GOOS
 	ostype := runtime.GOARCH
 	resurl := ""
+	fileName := ""
 	// Find the review items
 	items := doc.Find("div[class='d-flex flex-justify-between flex-items-center py-1 py-md-2 Box-body px-2']")
-	println(len(items.Nodes))
 	items.Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the band and title
-		band := s.Find("a").Text()
+		band := strings.TrimSpace(s.Find("a").Text())
 		href, _ := s.Find("a").Attr("href")
-		fmt.Printf("Review %d: %s - %s\n", i, band, "https://github.com"+href)
+		//fmt.Printf("Review %d: %s - %s\n", i, band, "https://github.com"+href)
 		if strings.Contains(href, osname) && strings.Contains(href, ostype) {
+			fileName = band
 			resurl = href
 		}
 	})
-	//href, _ := items.First().Find("a").Attr("href")
-
-	println(runtime.GOOS)
-	println(runtime.GOARCH)
-	println(strconv.IntSize)
-	return "https://github.com" + resurl
+	//println(runtime.GOOS)
+	//println(runtime.GOARCH)
+	//println(strconv.IntSize)
+	return fileName, "https://github.com" + resurl
 }
