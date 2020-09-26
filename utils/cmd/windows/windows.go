@@ -14,7 +14,7 @@ type Windows struct {
 }
 
 func (l Windows) RunCommand(cmd string) (string, error) {
-	fmt.Println("Running Linux cmd:" + cmd)
+	fmt.Println("Running Windows cmd:" + cmd)
 	command := exec.Command("cmd", "/c", cmd)
 
 	// 命令的错误输出和标准输出都连接到同一个管道
@@ -57,8 +57,7 @@ func (l Windows) CheckProRunning(serviceName string) (bool, error) {
 
 func (l Windows) GetPID(threadName string) (int, error) {
 	pid := 0
-	a := `tasklist | findstr '` + threadName + `'`
-	//out, _ := cmd.ExecCmd("cmd.exe", "/c tasklist | findstr frp")
+	a := `tasklist | findstr ` + threadName
 	out, err := Windows{}.RunCommand(a)
 	if err != nil {
 		return pid, err
