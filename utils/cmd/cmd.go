@@ -15,6 +15,9 @@ type CMDInterface interface {
 
 	//根据进程名称获取进程ID
 	GetPID(threadName string) (int, error)
+
+	// 后台运行
+	RunCommandBg(cmd string)
 }
 
 // 创建工厂结构体并实现工厂接口

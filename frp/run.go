@@ -1,12 +1,13 @@
 package frp
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"go-frpc/utils"
 	"go-frpc/utils/cmd"
+	"go-frpc/utils/cmd/linux"
 	"log"
 	"net/http"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -15,6 +16,7 @@ import (
 //检查frp状态，未启动返回0，运行中返回其pid
 func CheckStatus() int {
 	pid, _ := cmd.CMDFactory{}.Generate().GetPID("frp")
+	fmt.Println("****************************", pid)
 	return pid
 }
 
@@ -26,8 +28,13 @@ func Start() int {
 		return 0
 	}
 	frpc := dir[0]
-	frpStatus := exec.Command(frpc+"/frpc.exe", "-c", frpc+"/frpc.ini")
-	frpStatus.Start()
+
+	client := cmd.CMDFactory{}.Generate()
+	if (client == linux.Linux{}) {
+		client.RunCommandBg("nohup " + frpc + "/frpc -c " + frpc + "/frpc.ini &")
+	} else {
+		client.RunCommandBg(frpc + "/frpc.exe -c " + frpc + "/frpc.ini")
+	}
 
 	utils.Log.Info("frpc start success...")
 	return CheckStatus()
@@ -35,12 +42,19 @@ func Start() int {
 
 // 关闭frpc
 func Stop() {
-	out, _ := cmd.CMDFactory{}.Generate().RunCommand("taskkill /f /im frpc.exe")
+	out := ""
+	client := cmd.CMDFactory{}.Generate()
+	if (client == linux.Linux{}) {
+		out, _ = client.RunCommand("kill -9 $(pidof frpc)")
+	} else {
+		out, _ = client.RunCommand("taskkill /f /im frpc.exe")
+	}
+
+	utils.Log.Info("frpc close success...")
 	if out == "" {
 		println("frp 未启动")
 	}
 	utils.Log.Info(out)
-	println("frpc closed...")
 }
 
 // 下载并解压frp
@@ -59,6 +73,7 @@ func Download(fb func(length, downLen int64)) {
 	//utils.Log.Info("frp.zip end unzip...")
 }
 
+// 获取最新tag
 func LatestTag(baseUrl string) string {
 	// Request the HTML page.
 	res, err := http.Get(baseUrl)
@@ -84,6 +99,7 @@ func LatestTag(baseUrl string) string {
 
 }
 
+// 根据系统判定最新版本
 func LatestUrlOnOs() (string, string) {
 	baseUrl := "https://github.com/fatedier/frp/tags"
 	latestUrl := LatestTag(baseUrl)
@@ -119,8 +135,5 @@ func LatestUrlOnOs() (string, string) {
 			resurl = href
 		}
 	})
-	//println(runtime.GOOS)
-	//println(runtime.GOARCH)
-	//println(strconv.IntSize)
 	return fileName, "https://github.com" + resurl
 }

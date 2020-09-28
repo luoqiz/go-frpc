@@ -3,12 +3,25 @@ package linux
 import (
 	"fmt"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 // 创建产品1并实现产品接口
 type Linux struct {
+}
+
+func (l Linux) RunCommandBg(cmd string) {
+	//处理启动参数，通过空格分离 如：setsid /home/luojing/gotest/src/test_main/iwatch/test/while_little &
+	fmt.Println("Running Linux cmd: " + cmd)
+	command := exec.Command("/bin/sh", "-c", cmd)
+
+	if err := command.Start(); err != nil {
+		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
+		return
+	}
+	return
 }
 
 func (l Linux) RunCommand(cmd string) (string, error) {
@@ -59,5 +72,7 @@ func (l Linux) GetPID(threadName string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return strconv.Atoi(pid)
+	pattern := regexp.MustCompile(`(\d+)`)
+	numberStrings := pattern.FindString(pid)
+	return strconv.Atoi(numberStrings)
 }

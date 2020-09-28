@@ -13,6 +13,41 @@ import (
 type Windows struct {
 }
 
+func (l Windows) RunCommandBg(cmd string) {
+	fmt.Println("Running windows cmd:" + cmd)
+	command := exec.Command("cmd", "/c", cmd)
+
+	// 命令的错误输出和标准输出都连接到同一个管道
+	stdout, err := command.StdoutPipe()
+	command.Stderr = command.Stdout
+
+	if err != nil {
+		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
+		return
+	}
+
+	if err = command.Start(); err != nil {
+		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
+		return
+	}
+
+	var sb strings.Builder
+	// 从管道中实时获取输出并打印到终端
+	for {
+		tmp := make([]byte, 1024)
+		_, err := stdout.Read(tmp)
+		sb.Write(tmp)
+		if err != nil {
+			break
+		}
+	}
+
+	if err = command.Wait(); err != nil {
+		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
+	}
+	return
+}
+
 func (l Windows) RunCommand(cmd string) (string, error) {
 	fmt.Println("Running Windows cmd:" + cmd)
 	command := exec.Command("cmd", "/c", cmd)
