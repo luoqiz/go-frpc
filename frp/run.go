@@ -15,7 +15,7 @@ import (
 
 //检查frp状态，未启动返回0，运行中返回其pid
 func CheckStatus() int {
-	pid, _ := cmd.CMDFactory{}.Generate().GetPID("frp")
+	pid, _ := cmd.CMDFactory{}.Generate().GetPID("frpc")
 	fmt.Println("****************************", pid)
 	return pid
 }

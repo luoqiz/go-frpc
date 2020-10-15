@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"go-frpc/utils"
 	"os/exec"
-	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 // 创建 windows 并实现产品接口
@@ -16,34 +16,11 @@ type Windows struct {
 func (l Windows) RunCommandBg(cmd string) {
 	fmt.Println("Running windows cmd:" + cmd)
 	command := exec.Command("cmd", "/c", cmd)
-
-	// 命令的错误输出和标准输出都连接到同一个管道
-	stdout, err := command.StdoutPipe()
-	command.Stderr = command.Stdout
-
-	if err != nil {
-		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
-		return
-	}
-
+	command.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	var err error
 	if err = command.Start(); err != nil {
 		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
 		return
-	}
-
-	var sb strings.Builder
-	// 从管道中实时获取输出并打印到终端
-	for {
-		tmp := make([]byte, 1024)
-		_, err := stdout.Read(tmp)
-		sb.Write(tmp)
-		if err != nil {
-			break
-		}
-	}
-
-	if err = command.Wait(); err != nil {
-		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)
 	}
 	return
 }
@@ -92,21 +69,26 @@ func (l Windows) CheckProRunning(serviceName string) (bool, error) {
 
 func (l Windows) GetPID(threadName string) (int, error) {
 	pid := 0
-	a := `tasklist | findstr ` + threadName
+	a := `wmic process get name,executablepath,processid | findstr ` + threadName
 	out, err := Windows{}.RunCommand(a)
 	if err != nil {
 		return pid, err
 	}
-	utils.Log.Info(out)
-	re, _ := regexp.Compile(`\d+`)
-	//查找符合正则的第一个
-	all := re.FindAll([]byte(out), -1)
-	for index, item := range all {
-		if index == 0 {
-			pid, _ = strconv.Atoi(string(item))
-			break
-		}
 
+	rs := strings.Split(out, "\n")
+	utils.Log.Info(rs)
+	for _, item := range rs {
+		item = utils.DeleteExtraSpace(item)
+		item = strings.TrimSpace(item)
+		threadInfo := strings.Split(item, " ")
+		if len(threadInfo) == 3 {
+			tName := threadInfo[1]
+			if tName[0:len(tName)-4] == threadName {
+				pid, _ = strconv.Atoi(threadInfo[2])
+				return pid, nil
+			}
+		}
 	}
-	return pid, nil
+
+	return 0, nil
 }
