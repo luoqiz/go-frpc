@@ -3,11 +3,11 @@ frp 客户端可视化（目前只支持windows系统）
 
 <h2>源码下载后打包</h2>
 <h4>Windows 打包命令</h4>
-`fyne package -os windows -icon icon.png`
+```fyne package -os windows -icon icon.png```
 <h4>Linux 打包命令</h4>
-`fyne package -os linux -icon icon.png`
+```fyne package -os linux -icon icon.png```
 <h4>Macos 打包命令</h4>
-`fyne package -os darwin -icon icon.png`
+```fyne package -os darwin -icon icon.png```
 
 <h2>使用说明</h2>
 1. 下载frp
