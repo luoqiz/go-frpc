@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -38,6 +39,19 @@ func Download(url string, savePath string) {
 	}
 }
 
+func GetClient() *http.Client {
+	if AppConfig.ProxyAddr != "" {
+		proxy := func(_ *http.Request) (*url.URL, error) {
+			//根据定义Proxy func(*Request) (*url.URL, error)这里要返回url.URL
+			return url.Parse(AppConfig.ProxyAddr)
+		}
+		transport := &http.Transport{Proxy: proxy}
+		return &http.Client{Transport: transport}
+	}
+	//创建一个http client
+	return &http.Client{}
+}
+
 func DownloadProcess(url string, savePath string, fb func(length, downLen int64)) error {
 	var (
 		fsize   int64
@@ -45,7 +59,7 @@ func DownloadProcess(url string, savePath string, fb func(length, downLen int64)
 		written int64
 	)
 	//创建一个http client
-	client := new(http.Client)
+	client := GetClient()
 	//get方法获取资源
 	resp, err := client.Get(url)
 	if err != nil {

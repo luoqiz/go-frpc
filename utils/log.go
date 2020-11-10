@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -19,10 +20,11 @@ const (
 )
 
 func init() {
-	_, err := os.Stat(output_dir)
+	workSpacePath, _ := filepath.Abs("")
+	_, err := os.Stat(filepath.Join(workSpacePath, output_dir))
 	if err != nil {
 		if os.IsNotExist(err) {
-			err := os.Mkdir(output_dir, os.ModePerm)
+			err := os.Mkdir(filepath.Join(workSpacePath, output_dir), os.ModePerm)
 			if err != nil {
 				fmt.Printf("mkdir failed![%v]\n", err)
 			}
