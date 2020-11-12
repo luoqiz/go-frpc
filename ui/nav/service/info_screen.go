@@ -11,9 +11,8 @@ import (
 
 func InfoScreen(w fyne.Window) fyne.CanvasObject {
 
-	proxyLable := widget.NewLabel("请输入http代理")
 	proxyEntry := widget.NewEntry()
-	proxyBox := container.NewHBox(proxyLable, proxyEntry)
+	proxyBox := widget.NewForm(widget.NewFormItem("http代理", proxyEntry))
 	// 文件下载按钮
 	downloadButton := widget.NewButton("download",
 		func() {
@@ -24,7 +23,6 @@ func InfoScreen(w fyne.Window) fyne.CanvasObject {
 			prog.Show()
 			frp.Download(func(length, downLen int64) {
 				proc := float64(downLen)/float64(length) + 0.005
-				println(downLen, length, proc)
 				if proc < 1.0 {
 					prog.SetValue(proc)
 				} else {

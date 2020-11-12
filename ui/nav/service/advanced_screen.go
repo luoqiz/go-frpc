@@ -24,6 +24,8 @@ func AdvancedScreen(_ fyne.Window) fyne.CanvasObject {
 		}
 
 	})
-	//content.SetText(frp.FullContent())
-	return container.NewVBox(saveButton, reloadButton, content)
+	buttons := container.NewGridWithColumns(2, saveButton, reloadButton)
+	scroll := container.NewScroll(content)
+	scroll.SetMinSize(fyne.NewSize(400, 500))
+	return container.NewMax(container.NewVBox(buttons, container.NewAdaptiveGrid(1, scroll)))
 }

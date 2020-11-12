@@ -134,7 +134,7 @@ func CommonService(section string) fyne.CanvasObject {
 		frp.SaveSection(section, content.Text)
 	})
 	content.SetText(frp.GetSection(section))
-	return widget.NewVBox(saveButton, content)
+	return container.NewVBox(saveButton, content)
 }
 
 func WebService(section string) fyne.CanvasObject {
@@ -143,7 +143,7 @@ func WebService(section string) fyne.CanvasObject {
 		frp.SaveSection(section, content.Text)
 	})
 	content.SetText(frp.GetSection(section))
-	return widget.NewVBox(saveButton, content)
+	return container.NewVBox(saveButton, content)
 }
 
 func MstscService(section string) fyne.CanvasObject {
@@ -152,5 +152,5 @@ func MstscService(section string) fyne.CanvasObject {
 		frp.SaveSection(section, content.Text)
 	})
 	content.SetText(frp.GetSection(section))
-	return widget.NewVBox(saveButton, content)
+	return container.NewVBox(saveButton, content)
 }
