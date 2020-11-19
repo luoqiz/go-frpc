@@ -20,26 +20,31 @@ func StatusScreen(_ fyne.Window) fyne.CanvasObject {
 	}
 	statusShow := widget.NewLabelWithStyle(showText, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 
+	// 启动客户按钮
+	startButton := widget.NewButton("start", func() {
+		pid := frp.Start()
+		if pid != 0 {
+			statusShow.SetText(fmt.Sprintln("running pid: ", pid))
+		} else {
+			statusShow.SetText(fmt.Sprintln("please download frp... ", pid))
+		}
+	})
+
+	// 关闭客户端按钮
+	stopButton := widget.NewButton("stop", func() {
+		if frp.CheckStatus() != 0 {
+			frp.Stop()
+			statusShow.SetText("frp success closed...")
+		} else {
+			statusShow.SetText("frp not running...")
+		}
+
+	})
+
 	return container.NewVBox(
-
 		fyne.NewContainerWithLayout(layout.NewGridLayout(2),
-			widget.NewButton("start", func() {
-				pid := frp.Start()
-				if pid != 0 {
-					statusShow.SetText(fmt.Sprintln("running pid: ", pid))
-				} else {
-					statusShow.SetText(fmt.Sprintln("please download frp... ", pid))
-				}
-			}),
-			widget.NewButton("stop", func() {
-				if frp.CheckStatus() != 0 {
-					frp.Stop()
-					statusShow.SetText("frp success closed...")
-				} else {
-					statusShow.SetText("frp not running...")
-				}
-
-			}),
+			startButton,
+			stopButton,
 		),
 		statusShow,
 	)

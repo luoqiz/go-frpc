@@ -6,6 +6,7 @@ import (
 	"go-frpc/utils"
 	"go-frpc/utils/cmd"
 	"go-frpc/utils/cmd/linux"
+	"go-frpc/utils/cmd/windows"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -24,7 +25,8 @@ func CheckStatus() int {
 
 //开启frpc
 func Start() int {
-	workspace, _ := filepath.Abs("/")
+	workspace, _ := filepath.Abs("./")
+	println(workspace)
 	dir := utils.GetDirectory(workspace + "/frpc")
 	if len(dir) < 1 {
 		return 0
@@ -34,7 +36,9 @@ func Start() int {
 	client := cmd.CMDFactory{}.Generate()
 	if (client == linux.Linux{}) {
 		client.RunCommandBg("nohup " + frpc + "/frpc -c " + frpc + "/frpc.ini &")
-	} else {
+	} else if (client == windows.Windows{}) {
+		cmdstr := frpc + "/frpc.exe -c " + frpc + "/frpc.ini"
+		println(cmdstr)
 		client.RunCommandBg(frpc + "/frpc.exe -c " + frpc + "/frpc.ini")
 	}
 
@@ -74,7 +78,7 @@ func Download(fb func(length, downLen int64)) {
 	utils.Log.Info("frp download end...")
 
 	//utils.Log.Infof("frp unzip start into %s", workDir)
-	//utils.UnCompress(frpDownloadPath, workDir+"/frpc", true)
+	utils.UnCompress(frpDownloadPath, workDir+"/frpc", true)
 	//utils.Log.Info("frp.zip end unzip...")
 }
 
