@@ -13,16 +13,18 @@ import (
 func GetIniFilePath() string {
 	// 获取配置文件路径
 	workspace, _ := filepath.Abs("")
-	frpcpath := utils.GetDirectory(workspace + "/frpc")
-	if len(frpcpath) == 1 {
-		frpc := frpcpath[0]
-		return frpc + "/frpc.ini"
+	frpcpath := workspace + "/frpc.ini"
+	_, err := os.Stat(frpcpath)
+	if err != nil {
+		return ""
 	}
-	return ""
+	return frpcpath
 }
 
 func FullContent() (string, error) {
 	filename := GetIniFilePath()
+	println(filename)
+	println(filename)
 	//读取文本内容到文本框中
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {

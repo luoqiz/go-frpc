@@ -25,8 +25,7 @@ func CheckStatus() int {
 
 //开启frpc
 func Start() int {
-	workspace, _ := filepath.Abs("./")
-	println(workspace)
+	workspace, _ := filepath.Abs("")
 	dir := utils.GetDirectory(workspace + "/frpc")
 	if len(dir) < 1 {
 		return 0
@@ -35,13 +34,10 @@ func Start() int {
 
 	client := cmd.CMDFactory{}.Generate()
 	if (client == linux.Linux{}) {
-		client.RunCommandBg("nohup " + frpc + "/frpc -c " + frpc + "/frpc.ini &")
+		client.RunCommandBg("nohup " + frpc + "/frpc -c " + workspace + "/frpc.ini &")
 	} else if (client == windows.Windows{}) {
-		cmdstr := frpc + "/frpc.exe -c " + frpc + "/frpc.ini"
-		println(cmdstr)
-		client.RunCommandBg(frpc + "/frpc.exe -c " + frpc + "/frpc.ini")
+		client.RunCommandBg(frpc + "/frpc.exe -c " + workspace + "/frpc.ini")
 	}
-
 	utils.Log.Info("frpc start success...")
 	return CheckStatus()
 }
@@ -71,15 +67,16 @@ func Download(fb func(length, downLen int64)) {
 
 	frpName, frpUrl := ValidUrlOnOs()
 	frpDownloadPath := filepath.Join(workDir, frpName)
-	//frpDownloadPath := workDir + "/" + frpName
 	utils.Log.Infof("frp download path : %s", frpDownloadPath)
-	println(frpUrl, frpDownloadPath)
 	utils.DownloadProcess(frpUrl, frpDownloadPath, fb)
 	utils.Log.Info("frp download end...")
 
-	//utils.Log.Infof("frp unzip start into %s", workDir)
+	// 解压之前先删除已解压文件
+	utils.Log.Infof("frp unzip start into %s", workDir)
+	utils.DeleteDir(workDir + "/frpc")
 	utils.UnCompress(frpDownloadPath, workDir+"/frpc", true)
-	//utils.Log.Info("frp.zip end unzip...")
+	utils.DeleteFile(frpDownloadPath)
+	utils.Log.Info("frp.zip end unzip...")
 }
 
 // 获取最新tag

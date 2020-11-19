@@ -4,7 +4,7 @@ import "fyne.io/fyne"
 
 func SendNotifiction(content string) {
 	fyne.CurrentApp().SendNotification(&fyne.Notification{
-		Title:   "frpc",
+		Title:   "go-frpc 客户端",
 		Content: content,
 	})
 }

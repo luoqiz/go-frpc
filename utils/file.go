@@ -39,6 +39,73 @@ func Download(url string, savePath string) {
 	}
 }
 
+func CreateFile(file string) error {
+	_, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CopyFile(srcFile string, destFile string) error {
+
+	var BUFFERSIZE int64
+
+	// 判断是否是可读取常规文件
+	srcFileStat, err := os.Stat(srcFile)
+	if err != nil {
+		return err
+	}
+	if !srcFileStat.Mode().IsRegular() {
+		return fmt.Errorf("%s is not a regular file.", srcFile)
+	}
+
+	// 打开源文件
+	source, err := os.Open(srcFile)
+	if err != nil {
+		return err
+	}
+	defer source.Close()
+
+	dest, err := os.Open(destFile)
+	if err != nil {
+		return err
+	}
+	defer dest.Close()
+
+	buf := make([]byte, BUFFERSIZE)
+
+	for {
+		n, err := source.Read(buf)
+		if err != nil && err != io.EOF {
+			return err
+		}
+		if n == 0 {
+			break
+		}
+		if _, err := dest.Write(buf[:n]); err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+func DeleteFile(filename string) error {
+	_, err := os.Stat(filename)
+	if err != nil {
+		return err
+	}
+	return os.Remove(filename)
+}
+
+func DeleteDir(path string) error {
+	_, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	return os.RemoveAll(path)
+}
+
 func GetClient() *http.Client {
 	if AppConfig.ProxyAddr != "" {
 		proxy := func(_ *http.Request) (*url.URL, error) {
