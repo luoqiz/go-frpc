@@ -5,7 +5,7 @@ import (
 	"fyne.io/fyne/container"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
-	"go-frpc/frp"
+	"go-frpc/src/frp"
 	"gopkg.in/ini.v1"
 )
 

@@ -2,7 +2,7 @@ package nav
 
 import (
 	"fyne.io/fyne"
-	"go-frpc/ui/nav/service"
+	"go-frpc/src/ui/nav/service"
 )
 
 type Item struct {

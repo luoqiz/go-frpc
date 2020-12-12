@@ -3,10 +3,11 @@ package frp
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"go-frpc/utils"
-	"go-frpc/utils/cmd"
-	"go-frpc/utils/cmd/linux"
-	"go-frpc/utils/cmd/windows"
+	"go-frpc/src/utils"
+	"go-frpc/src/utils/cmd"
+	"go-frpc/src/utils/cmd/linux"
+	"go-frpc/src/utils/cmd/windows"
+
 	"log"
 	"net/http"
 	"path/filepath"

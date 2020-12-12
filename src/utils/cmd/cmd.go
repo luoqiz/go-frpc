@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"go-frpc/utils/cmd/linux"
-	"go-frpc/utils/cmd/windows"
+	"go-frpc/src/utils/cmd/linux"
+	"go-frpc/src/utils/cmd/windows"
 	"runtime"
 )
 

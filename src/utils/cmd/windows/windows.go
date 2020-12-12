@@ -2,11 +2,10 @@ package windows
 
 import (
 	"fmt"
-	"go-frpc/utils"
+	"go-frpc/src/utils"
 	"os/exec"
 	"strconv"
 	"strings"
-	"syscall"
 )
 
 // 创建 windows 并实现产品接口
@@ -16,7 +15,7 @@ type Windows struct {
 func (l Windows) RunCommandBg(cmd string) {
 	fmt.Println("Running windows cmd:" + cmd)
 	command := exec.Command("cmd", "/c", cmd)
-	command.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	//command.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	var err error
 	if err = command.Start(); err != nil {
 		fmt.Printf("%v: Command finished with error: %v\n", "get_time()", err)

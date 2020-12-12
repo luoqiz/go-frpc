@@ -3,7 +3,7 @@ package frp
 import (
 	"bytes"
 	"fmt"
-	"go-frpc/utils"
+	"go-frpc/src/utils"
 	"gopkg.in/ini.v1"
 	"io/ioutil"
 	"os"

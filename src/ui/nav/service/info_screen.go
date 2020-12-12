@@ -5,8 +5,8 @@ import (
 	"fyne.io/fyne/container"
 	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/widget"
-	"go-frpc/frp"
-	"go-frpc/utils"
+	"go-frpc/src/frp"
+	"go-frpc/src/utils"
 )
 
 func InfoScreen(w fyne.Window) fyne.CanvasObject {

@@ -6,7 +6,7 @@ import (
 	"fyne.io/fyne/container"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
-	"go-frpc/frp"
+	"go-frpc/src/frp"
 )
 
 func StatusScreen(_ fyne.Window) fyne.CanvasObject {

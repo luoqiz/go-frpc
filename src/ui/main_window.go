@@ -8,8 +8,8 @@ import (
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
-	"go-frpc/frp"
-	"go-frpc/ui/nav"
+	"go-frpc/src/frp"
+	"go-frpc/src/ui/nav"
 )
 
 const preferenceCurrentTutorial = "currentTutorial"

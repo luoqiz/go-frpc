@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-frpc/ui"
+	"go-frpc/src/ui"
 )
 
 func main() {
