@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// 创建产品1并实现产品接口
+// 创建Linux 平台并实现接口
 type Linux struct {
 }
 
@@ -67,7 +67,8 @@ func (l Linux) CheckProRunning(serviceName string) (bool, error) {
 }
 
 func (l Linux) GetPID(threadName string) (int, error) {
-	a := `ps aux | awk '/` + threadName + `/ && !/awk/ {print $2}'`
+	//a := `ps aux | awk '/` + threadName + `/ && !/awk/ {print $2}'`
+	a := `pidof ` + threadName
 	pid, err := Linux.RunCommand(Linux{}, a)
 	if err != nil {
 		return 0, err
