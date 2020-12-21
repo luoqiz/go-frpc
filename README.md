@@ -1,5 +1,5 @@
 # go-frpc
-frp 客户端可视化（目前只支持windows系统）
+frp 客户端可视化（目前只支持windows、Linux系统）
 
 <h2>源码下载后打包</h2>
 <h4>Windows 打包命令</h4>
@@ -8,6 +8,11 @@ frp 客户端可视化（目前只支持windows系统）
 `fyne package -os linux -icon icon.png`
 <h4>Macos 打包命令</h4>
 `fyne package -os darwin -icon icon.png`
+
+<h5>注意：
+在Linux平台开发打包时需要注释 src/utils/cmd/windows/windows.go 文件中 `RunCommandBg` 方法中的行 `command.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}`<br/> 
+在windows打包时必须打开</h5>
+
 
 <h2>使用说明</h2>
 
