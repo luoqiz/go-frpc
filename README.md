@@ -42,3 +42,7 @@ frp 客户端可视化（目前只支持windows、Linux系统）
     4. 增加 linux 平台使用
     
 - 2020-8-31  v0.1基本使用
+
+## 致谢
+
+- (https://www.jetbrains.com/?from=mogu_blog_v2)感谢 **[jetbrains](https://www.jetbrains.com/?from=mogu_blog_v2)** 提供的开源License 
