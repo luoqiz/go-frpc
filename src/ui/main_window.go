@@ -2,12 +2,12 @@ package ui
 
 import (
 	"fmt"
-	"fyne.io/fyne"
-	"fyne.io/fyne/app"
-	"fyne.io/fyne/container"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/theme"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
+	"fyne.io/fyne/v2/widget"
 	"go-frpc/src/frp"
 	"go-frpc/src/ui/nav"
 )
@@ -116,7 +116,7 @@ func makeNav(setNavItem func(navItem nav.Item), loadPrevious bool) fyne.CanvasOb
 		tree.Select(currentPref)
 	}
 
-	themes := fyne.NewContainerWithLayout(layout.NewGridLayout(2),
+	themes := container.New(layout.NewGridLayout(2),
 		widget.NewButton("Dark", func() {
 			a.Settings().SetTheme(theme.DarkTheme())
 		}),

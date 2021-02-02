@@ -11,3 +11,5 @@ frp.zip
 /.idea/
 /download/
 *.iml
+/src/frpc/
+/logs/

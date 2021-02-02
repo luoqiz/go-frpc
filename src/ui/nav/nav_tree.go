@@ -1,7 +1,7 @@
 package nav
 
 import (
-	"fyne.io/fyne"
+	"fyne.io/fyne/v2"
 	"go-frpc/src/ui/nav/service"
 )
 

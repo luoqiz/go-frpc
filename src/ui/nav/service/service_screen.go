@@ -1,10 +1,10 @@
 package service
 
 import (
-	"fyne.io/fyne"
-	"fyne.io/fyne/container"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 	"go-frpc/src/frp"
 	"gopkg.in/ini.v1"
 )
@@ -16,7 +16,7 @@ func ServiceScreen(_ fyne.Window) fyne.CanvasObject {
 	//	widget.NewTabItem("http", WebService("web")),
 	//	widget.NewTabItem("mstsc", MstscService("mstsc")),
 	//)
-	tabs := widget.NewTabContainer()
+	tabs := container.NewAppTabs()
 	sections, err := frp.GetSections()
 	if err != nil {
 		return widget.NewLabel("please download frp...")
@@ -25,14 +25,14 @@ func ServiceScreen(_ fyne.Window) fyne.CanvasObject {
 		if section == ini.DefaultSection {
 			continue
 		}
-		tabs.Append(widget.NewTabItem(section, loadService(section)))
+		tabs.Append(container.NewTabItem(section, loadService(section)))
 	}
 
 	tabs.OnChanged = func(t *container.TabItem) {
 		println(t.Text)
 		t.Content = loadService(t.Text)
 	}
-	return fyne.NewContainerWithLayout(layout.NewBorderLayout(nil, nil, nil, nil),
+	return container.New(layout.NewBorderLayout(nil, nil, nil, nil),
 		tabs,
 	)
 
@@ -44,5 +44,7 @@ func loadService(section string) fyne.CanvasObject {
 		frp.SaveSection(section, content.Text)
 	})
 	content.SetText(frp.GetSection(section))
-	return container.NewVBox(saveButton, content)
+	scroll := container.NewScroll(content)
+	scroll.SetMinSize(fyne.NewSize(400, 500))
+	return container.NewVBox(saveButton, container.NewAdaptiveGrid(1, scroll))
 }

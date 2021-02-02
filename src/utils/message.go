@@ -1,6 +1,6 @@
 package utils
 
-import "fyne.io/fyne"
+import "fyne.io/fyne/v2"
 
 func SendNotifiction(content string) {
 	fyne.CurrentApp().SendNotification(&fyne.Notification{
